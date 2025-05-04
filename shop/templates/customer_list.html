@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+<div class="item-list-header">
+  <h2>Customers</h2>
+  <a href="{{ url_for('shop.manage_customer') }}" class="add-btn">Add Customer</a>
+</div>
+
+<div class="item-list">
+  {% for customer in customers %}
+    <div class="item-wrapper">
+      <input type="checkbox" class="item-check">
+      <a href="{{ url_for('shop.manage_customer', user_id=customer.user_id) }}" class="item-link">
+        <img src="https://www.gravatar.com/avatar/{{ customer.email|hash }}?d=identicon&s=40"
+             alt="Avatar" class="item-img">
+        <div class="item-info">
+          <h3>{{ customer.name }}</h3>
+          <p style="font-size: 0.75rem; color: #777; margin: 0;">{{ customer.email }}</p>
+        </div>
+        <span class="item-meta">ID: {{ customer.user_id }}</span>
+      </a>
+    </div>
+  {% else %}
+    <p>No customers yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

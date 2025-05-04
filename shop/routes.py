@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from .models import Product
-from .forms import CreateProductForm
+from .models import Product, User, Role
+from .forms import CreateProductForm, CreateUserForm
 from . import db
 
 shop_bp = Blueprint("shop", __name__, template_folder="templates")
@@ -38,3 +38,43 @@ def manage_product(product_id=None):
 def view_products():
     products = Product.query.all()
     return render_template("product_list.html", products=products)
+
+
+@shop_bp.route("/customers", methods=["GET"])
+def view_customers():
+    customers = db.session.query(User).join(Role).filter(Role.is_admin == False).all()
+    return render_template("customer_list.html", customers=customers)
+
+
+@shop_bp.route("/customer", methods=["GET", "POST"])
+@shop_bp.route("/customer/<int:user_id>", methods=["GET", "POST"])
+def manage_customer(user_id=None):
+    user = User.query.get(user_id) if user_id else None
+    form = CreateUserForm(obj=user)
+
+    # Populate role choices
+    form.role_id.choices = [(role.role_id, "Admin" if role.is_admin else "User") for role in Role.query.all()]
+
+    if form.validate_on_submit():
+        if user:
+            user.name = form.name.data
+            user.email = form.email.data
+            user.role_id = form.role_id.data
+            # only update password if changed
+            if form.password.data:
+                user.password = form.password.data  # hash this in production!
+            flash("Customer updated!", "success")
+        else:
+            user = User(
+                name=form.name.data,
+                email=form.email.data,
+                password=form.password.data,  # hash this in production!
+                role_id=form.role_id.data
+            )
+            db.session.add(user)
+            flash("Customer created!", "success")
+
+        db.session.commit()
+        return redirect(url_for("shop.customers_list"))
+
+    return render_template("manage_customer.html", form=form, user=user)

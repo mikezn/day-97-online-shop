@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}
+  {% if user %}Edit: {{ user.name }}{% else %}Add Customer{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2 class="form-heading">
+  {% if user %}Edit: {{ user.name }}{% else %}Add Customer{% endif %}
+</h2>
+
+<form method="POST" class="product-form">
+  {{ form.hidden_tag() }}
+
+  <div class="form-block">
+    <label>{{ form.name.label }}</label>
+    {{ form.name(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    <label>{{ form.email.label }}</label>
+    {{ form.email(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    <label>{{ form.password.label }}</label>
+    {{ form.password(class="form-control") }}
+    {% if user %}
+      <small style="color: #666; font-size: 0.85rem;">Leave blank to keep current password.</small>
+    {% endif %}
+  </div>
+
+  <div class="form-block">
+    <label>{{ form.role_id.label }}</label>
+    {{ form.role_id(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    {{ form.submit(class="form-submit") }}
+  </div>
+</form>
+{% endblock %}

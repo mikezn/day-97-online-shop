@@ -12,8 +12,9 @@
       </a>
     </li>
     <li>
-      <a href="#">
-        <i data-lucide="users"></i> Users
+      <a href="{{ url_for('shop.view_customers') }}"
+         class="{% if request.endpoint == 'shop.view_customers' %}active{% endif %}">
+        <i data-lucide="users"></i> Customers
       </a>
     </li>
   </ul>

@@ -1,0 +1,30 @@
+{% extends "public_layout.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <h2 class="form-heading">Log In</h2>
+
+  <form method="POST" class="standard-form">
+    {{ form.hidden_tag() }}
+
+    <div class="form-block">
+      <label>{{ form.email.label }}</label>
+      {{ form.email(class="form-control") }}
+    </div>
+
+    <div class="form-block">
+      <label>{{ form.password.label }}</label>
+      {{ form.password(class="form-control") }}
+    </div>
+
+    <div class="form-block">
+      {{ form.submit(class="form-submit") }}
+    </div>
+  </form>
+
+  <p style="margin-top: 1rem; font-size: 0.9rem;">
+    Don’t have an account? <a href="{{ url_for('shop.register') }}">Register here</a>
+  </p>
+</div>
+{% endblock %}

@@ -26,3 +26,9 @@ class CreateUserForm(FlaskForm):
 class CreateRoleForm(FlaskForm):
     is_admin = BooleanField("Admin", validators=[DataRequired()])
     submit = SubmitField("Save Role")
+
+
+class LoginForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Log In")

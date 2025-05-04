@@ -1,0 +1,22 @@
+{% extends "public_layout.html" %}
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<h2 class="form-heading">Browse Our Products</h2>
+
+<div class="product-grid">
+  {% for product in products %}
+    <div class="product-card">
+      <a href="{{ url_for('public.store_product_detail', product_id=product.product_id) }}">
+        <img src="{{ product.img_url }}" alt="{{ product.name }}" class="product-thumb">
+        <div class="product-info-tile">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-price-tile">${{ "%.2f"|format(product.price) }}</p>
+        </div>
+      </a>
+    </div>
+  {% else %}
+    <p>No products available.</p>
+  {% endfor %}
+</div>
+{% endblock %}
