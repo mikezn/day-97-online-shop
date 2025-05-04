@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}All Products{% endblock %}
+
+{% block content %}
+<div class="product-list-header">
+  <h2>All Products</h2>
+  <a href="{{ url_for('shop.manage_product') }}" class="add-product-btn">+ Add Product</a>
+</div>
+
+<div class="product-list">
+  {% for product in products %}
+    <div class="product-item-wrapper">
+      <input type="checkbox" class="product-check">
+      <a href="{{ url_for('shop.manage_product', product_id=product.id) }}" class="product-item">
+        <img src="{{ product.img_url }}" alt="{{ product.product }}" class="product-img">
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+        </div>
+        <div class="product-price">
+          ${{ product.price }}
+        </div>
+      </a>
+    </div>
+  {% else %}
+    <p>No products yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

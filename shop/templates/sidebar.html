@@ -1,0 +1,24 @@
+<nav>
+  <ul>
+    <li>
+        <a href="{{ url_for('shop.view_products') }}"
+           class="{% if request.endpoint == 'shop.view_products' %}active{% endif %}">
+           <i data-lucide="box"></i> Products
+        </a>
+    </li>
+    <li>
+      <a href="#">
+        <i data-lucide="shopping-cart"></i> Orders
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <i data-lucide="users"></i> Users
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  lucide.createIcons();
+</script>

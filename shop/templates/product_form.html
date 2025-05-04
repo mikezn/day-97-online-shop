@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="form-heading">
+  {% if product %}Edit: {{ product.name }}{% else %}Add Product{% endif %}
+</h2>
+
+<form method="POST" class="product-form" onsubmit="syncQuillContent()">
+  {{ form.hidden_tag() }}
+
+  <div class="form-block">
+    <label>{{ form.name.label }}</label>
+    {{ form.name(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    <label for="description">Description</label>
+
+    <!-- Pure hidden field that Flask will receive -->
+    <input type="hidden" name="description" id="description">
+
+    <!-- Quill editor container -->
+    <div id="quill-editor" style="height: 200px;"></div>
+  </div>
+
+  <div class="form-block">
+    <label>{{ form.img_url.label }}</label>
+    {{ form.img_url(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    <label>{{ form.price.label }}</label>
+    {{ form.price(class="form-control") }}
+  </div>
+
+  <div class="form-block">
+    {{ form.submit(class="form-submit") }}
+  </div>
+</form>
+
+<!-- Quill Text Editor CDN -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<script>
+  const quill = new Quill('#quill-editor', {
+    theme: 'snow',
+    placeholder: 'Write your product description here...'
+  });
+
+  // Load initial data if editing
+  const existingContent = {{ form.description.data|tojson }};
+  if (existingContent) {
+    quill.root.innerHTML = existingContent;
+  }
+
+  function syncQuillContent() {
+    const html = quill.root.innerHTML;
+    document.getElementById('description').value = html;
+  }
+</script>
+
+{% endblock %}

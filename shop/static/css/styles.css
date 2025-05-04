@@ -1,0 +1,228 @@
+/* === Global Styles === */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9f9f9;
+}
+
+/* === Layout === */
+.admin-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 220px;
+    background-color: #1e1e2f;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin: 1rem 0;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #2e2e40;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* === Product List === */
+.product-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-item:first-child {
+    border-top: 1px solid #e0e0e0;
+}
+
+.product-item-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.product-check {
+    margin: 0 1rem;
+    transform: scale(1.2);
+}
+
+/* Full clickable row (excluding checkbox) */
+.product-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    background-color: white;
+    padding: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.product-item:hover {
+    background-color: #f0f4ff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.product-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.product-info h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.product-price {
+    font-weight: bold;
+    margin-left: 2rem;
+    white-space: nowrap;
+    color: #333;
+}
+
+/* === Responsive tweaks (optional) === */
+@media (max-width: 768px) {
+    .product-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .product-price {
+        margin-left: 0;
+    }
+
+    .product-info h3,
+    .product-info p {
+        white-space: normal;
+    }
+}
+
+.product-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.add-product-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.add-product-btn:hover {
+    background-color: #0056b3;
+}
+
+.form-heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: white;
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;                 /* Remove auto-centering */
+    max-width: none;           /* Remove max width constraint */
+}
+
+.form-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-control {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.form-textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.form-submit {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.form-submit:hover {
+    background-color: #0056b3;
+}
+
+#quill-editor {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 1rem;
+}
