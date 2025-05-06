@@ -24,7 +24,7 @@ def create_shop():
 
     # Init extensions
     db.init_app(app)
-    # login_manager.init_app(app)
+    login_manager.init_app(app)
     csrf.init_app(app)
 
     # Register Jinja filter

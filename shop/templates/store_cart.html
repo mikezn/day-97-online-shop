@@ -1,0 +1,48 @@
+{% extends "public_layout.html" %}
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<h2 class="form-heading">Your Shopping Cart</h2>
+
+{% if not items %}
+  <p>Your cart is empty.</p>
+{% else %}
+  <div class="cart-list">
+    {% for item in items %}
+      <div class="cart-item">
+          <img src="{{ item.product.img_url }}" alt="{{ item.product.name }}" class="cart-img">
+
+          <div class="cart-details">
+            <h4 class="cart-title">{{ item.product.name }}</h4>
+            <p class="cart-price">${{ item.product.price }}</p>
+          </div>
+
+          <form method="POST" action="{{ url_for('public.update_cart_quantity', product_id=item.product_id) }}" class="cart-quantity-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" name="quantity" value="{{ item.quantity - 1 }}">−</button>
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="0">
+            <button type="submit" name="quantity" value="{{ item.quantity + 1 }}">+</button>
+          </form>
+
+          <form method="POST" action="{{ url_for('public.update_cart_quantity', product_id=item.product_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="quantity" value="0">
+            <button type="submit" class="cart-delete-btn" title="Remove from cart">🗑️</button>
+          </form>
+
+          <div class="cart-total">${{ '%.2f' % (item.quantity * item.product.price) }}</div>
+      </div>
+
+    {% endfor %}
+  </div>
+
+  <div class="cart-summary">
+    <strong>Total:</strong>
+    <span class="cart-total-amount">${{ '%.2f' % total }}</span>
+  </div>
+
+  <div class="cart-actions">
+    <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+  </div>
+{% endif %}
+{% endblock %}

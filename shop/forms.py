@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, DecimalField, TextAreaField, SelectField, BooleanField
+from wtforms import StringField, SubmitField, PasswordField, DecimalField, TextAreaField, SelectField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, URL, Email, NumberRange, Length
 
 
@@ -25,10 +25,28 @@ class CreateUserForm(FlaskForm):
 
 class CreateRoleForm(FlaskForm):
     is_admin = BooleanField("Admin", validators=[DataRequired()])
+    role = StringField("Role", validators=[DataRequired(), Length(max=100)])
     submit = SubmitField("Save Role")
+
+
+class RegisterForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Register")
 
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log In")
+
+
+class CartForm(FlaskForm):
+    product_name = name = StringField("Product Name", validators=[DataRequired(), Length(max=100)])
+    quantity = IntegerField("Quantity", validators=[DataRequired()])
+    total = DecimalField("Total", places=2, rounding=None, validators=[
+        DataRequired(),
+        NumberRange(min=0, message="Price must be non-negative")
+    ])
+    submit = SubmitField("Checkout")

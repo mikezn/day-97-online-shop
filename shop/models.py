@@ -15,10 +15,15 @@ class User(UserMixin, db.Model):
     orders = relationship("Order", back_populates="user")
     role = relationship("Role", back_populates="users")
 
+    # Flask-Login looks for id by default, flask login should use this instead by overriding get_id() in this model:
+    def get_id(self):
+        return str(self.user_id)
+
 
 class Role(db.Model):
     __tablename__ = "roles"
     role_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role: Mapped[str] = mapped_column(String(100), unique=True)
     is_admin: Mapped[bool] = mapped_column(Boolean)
     # relationships
     users = relationship("User", back_populates="role")
