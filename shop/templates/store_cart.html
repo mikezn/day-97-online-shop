@@ -17,22 +17,16 @@
             <p class="cart-price">${{ item.product.price }}</p>
           </div>
 
-          <form method="POST" action="{{ url_for('public.update_cart_quantity', product_id=item.product_id) }}" class="cart-quantity-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" name="quantity" value="{{ item.quantity - 1 }}">−</button>
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="0">
-            <button type="submit" name="quantity" value="{{ item.quantity + 1 }}">+</button>
-          </form>
+          <!-- Quantity Controls with JS -->
+          <div class="cart-quantity-form">
+            <button type="button" class="quantity-btn" onclick="updateQuantity({{ item.product_id }}, {{ item.quantity - 1 }})">−</button>
+            <input type="number" class="quantity-input" value="{{ item.quantity }}" min="0" onchange="updateQuantity({{ item.product_id }}, this.value)">
+            <button type="button" class="quantity-btn" onclick="updateQuantity({{ item.product_id }}, {{ item.quantity + 1 }})">+</button>
+          </div>
 
-          <form method="POST" action="{{ url_for('public.update_cart_quantity', product_id=item.product_id) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="quantity" value="0">
-            <button type="submit" class="cart-delete-btn" title="Remove from cart">🗑️</button>
-          </form>
-
+          <button class="cart-delete-btn" title="Remove from cart" onclick="removeFromCart({{ item.product_id }})">🗑️</button>
           <div class="cart-total">${{ '%.2f' % (item.quantity * item.product.price) }}</div>
       </div>
-
     {% endfor %}
   </div>
 
@@ -42,7 +36,106 @@
   </div>
 
   <div class="cart-actions">
-    <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+    <div id="paypal-button-container"></div>
   </div>
 {% endif %}
+
+<script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+<script>
+  // CSRF Token Fetch
+  async function getCsrfToken() {
+    const response = await fetch("/get-csrf-token");
+    const data = await response.json();
+    return data.csrf_token;
+  }
+
+  // Update Cart Quantity
+  async function updateQuantity(productId, quantity) {
+    const csrfToken = await getCsrfToken();
+    console.log("Updating quantity for product:", productId, "to:", quantity);
+
+    const response = await fetch(`/cart/update/${productId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({ quantity: quantity })
+    });
+
+    if (response.ok) {
+      console.log("Quantity updated successfully");
+      location.reload(); // Full reload for simplicity
+    } else {
+      console.error("Failed to update quantity:", response);
+      alert("Failed to update quantity. Please try again.");
+    }
+  }
+
+  // Remove from Cart
+  async function removeFromCart(productId) {
+    const csrfToken = await getCsrfToken();
+    const response = await fetch(`/cart/update/${productId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({ quantity: 0 })
+    });
+
+    if (response.ok) {
+      console.log("Item removed successfully");
+      location.reload();
+    } else {
+      console.error("Failed to remove item:", response);
+      alert("Failed to remove item. Please try again.");
+    }
+  }
+
+  // PayPal Integration
+  paypal.Buttons({
+    createOrder: async function() {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ cart: "current" })
+      });
+
+      const orderData = await response.json();
+      if (orderData.id) {
+        return orderData.id;
+      } else {
+        console.error("❌ Error creating PayPal order:", orderData);
+        throw new Error("Could not create PayPal order.");
+      }
+    },
+    onApprove: async function(data) {
+      const csrfToken = await getCsrfToken();
+      const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        }
+      });
+
+      const orderData = await response.json();
+      if (orderData.status === "COMPLETED") {
+        alert("✅ Payment completed successfully!");
+        window.location.href = "/order/confirmation";
+      } else {
+        alert("❌ Payment failed. Please try again.");
+      }
+    },
+    onError: function(err) {
+      console.error("❌ PayPal Error:", err);
+    }
+  }).render("#paypal-button-container");
+</script>
+
 {% endblock %}
