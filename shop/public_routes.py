@@ -235,31 +235,45 @@ def capture_paypal_order(order_id):
         request_capture = OrdersCaptureRequest(order_id)
         request_capture.request_body({})  # Empty JSON body for capture
 
-        # Execute capture request
-        response = current_app.paypal_client.execute(request_capture)
+        # ✅ Use the global paypal_client directly
+        response = paypal_client.execute(request_capture)
         print("✅ Raw PayPal Response:", response)
         result = response.result
 
         print(f"✅ Capture Result: {result.status}")
 
-        # Return a successful capture response
-        return jsonify({
+        # Extract purchase units and capture details
+        captured_data = {
             "status": result.status,
             "id": result.id,
-            "purchase_units": [
-                {
-                    "amount": unit.amount.value,
-                    "currency": unit.amount.currency_code,
-                    "items": [
-                        {
-                            "name": item.name,
-                            "quantity": item.quantity,
-                            "unit_amount": item.unit_amount.value
-                        } for item in unit.items
-                    ]
-                } for unit in result.purchase_units
-            ]
-        })
+            "purchase_units": []
+        }
+
+        for unit in result.purchase_units:
+            unit_data = {
+                "amount": None,
+                "currency": None,
+                "items": []
+            }
+
+            # Access the captured payments
+            if hasattr(unit, "payments") and hasattr(unit.payments, "captures"):
+                for capture in unit.payments.captures:
+                    unit_data["amount"] = capture.amount.value
+                    unit_data["currency"] = capture.amount.currency_code
+
+            captured_data["purchase_units"].append(unit_data)
+
+        print("✅ Captured Order Data:", captured_data)
+
+        # mark the user's cart order as completed
+        cart_order = Order.query.filter_by(user_id=current_user.user_id, is_cart=True).first()
+        if cart_order:
+            cart_order.is_cart = False
+            db.session.commit()
+            print("✅ Order marked as completed.")
+
+        return jsonify(captured_data)
     except Exception as e:
         print("❌ Exception during PayPal Order Capture:", str(e))
         return jsonify({"error": str(e)}), 500
