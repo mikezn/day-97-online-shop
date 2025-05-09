@@ -516,3 +516,57 @@ body {
 #paypal-button-container {
     margin-top: 1rem;
 }
+
+
+/* ORDER CONFIRMATION PAGE */
+.order-summary {
+    background: #ffffff;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+}
+
+.order-items {
+    margin-top: 1rem;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.75rem 0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 1rem;
+}
+
+.order-details {
+    flex-grow: 1;
+}
+
+.order-details h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.order-total {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: right;
+}
+
+.order-actions {
+    margin-top: 1rem;
+    text-align: right;
+}

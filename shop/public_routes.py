@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify, current_app
-from flask_login import current_user, login_user, login_required
+from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify, session
+from flask_login import current_user, login_user, login_required, logout_user
 from .models import db, Product, Order, OrderProduct, User, Role
 from .forms import LoginForm, RegisterForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -105,6 +105,12 @@ def login():
             return redirect(url_for("public.store_home"))
 
     return render_template("login.html", form=form)
+
+
+@public_bp.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('store_products'))
 
 
 @public_bp.route("/cart")
@@ -271,6 +277,8 @@ def capture_paypal_order(order_id):
         if cart_order:
             cart_order.is_cart = False
             db.session.commit()
+            # ✅ Store the completed order ID in the session
+            session["completed_order_id"] = cart_order.order_id
             print("✅ Order marked as completed.")
 
         return jsonify(captured_data)
@@ -284,3 +292,34 @@ def get_csrf_token():
     from flask import jsonify
     token = generate_csrf()
     return jsonify({"csrf_token": token})
+
+
+@public_bp.route("/order/confirmation")
+@login_required
+def order_confirmation():
+    order_id = session.get("completed_order_id")
+    print(order_id)
+
+    if not order_id:
+        flash("No recent order found.")
+        return redirect(url_for("public.store_home"))
+
+    # Fetch the specific completed order
+    completed_order = Order.query.filter_by(order_id=order_id, user_id=current_user.user_id, is_cart=False).first()
+
+    if not completed_order:
+        flash("Order not found.")
+        return redirect(url_for("public.store_home"))
+
+    items = completed_order.order_products
+    total = sum(item.quantity * item.product.price for item in items)
+
+    # Clear the session to prevent reusing it
+    session.pop("completed_order_id", None)
+    session.pop("paypal_transaction_id", None)  # Clear PayPal Transaction ID too
+
+    return render_template("store_order_confirmation.html",
+                           order=completed_order,
+                           items=items,
+                           total=total,
+                           paypal_transaction_id=session.get("paypal_transaction_id"))

@@ -1,0 +1,51 @@
+{% extends "public_layout.html" %}
+{% block title %}Order Confirmation{% endblock %}
+
+{% block content %}
+<h2 class="form-heading">Order Confirmation</h2>
+
+{% if order %}
+  <div class="order-summary">
+    <h3>Order #{{ order.order_id }}</h3>
+    <p><strong>Status:</strong> Completed</p>
+    <p><strong>Order Date:</strong> {{ order.order_date.strftime('%Y-%m-%d %H:%M:%S') if order.order_date else "N/A" }}</p>
+
+    <div class="order-items">
+      <h4>Items:</h4>
+      <ul>
+        {% for item in order.order_products %}
+        <li class="order-item">
+          <div class="order-item-details">
+            <img src="{{ item.product.img_url }}" alt="{{ item.product.name }}" class="order-item-img">
+            <div class="order-item-info">
+              <h5>{{ item.product.name }}</h5>
+              <p>Quantity: {{ item.quantity }}</p>
+              <p>Price: ${{ item.product.price }}</p>
+              <p>Total: ${{ '%.2f' % (item.quantity * item.product.price) }}</p>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="order-total">
+      <h4>Total: $
+        {% set total = 0 %}
+        {% for item in order.order_products %}
+          {% set total = total + (item.quantity * item.product.price) %}
+        {% endfor %}
+        {{ '%.2f' % total }}
+</h4>
+
+    </div>
+
+    <div class="order-actions">
+      <a href="{{ url_for('public.store_home') }}" class="btn-primary">Continue Shopping</a>
+    </div>
+  </div>
+{% else %}
+  <p>No order found.</p>
+  <a href="{{ url_for('public.store_home') }}" class="btn-primary">Return to Store</a>
+{% endif %}
+{% endblock %}

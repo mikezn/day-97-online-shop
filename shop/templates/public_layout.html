@@ -11,10 +11,13 @@
       <a href="{{ url_for('public.store_home') }}" class="nav-brand">🛍️ MyShop</a>
       <nav class="nav-links">
         <a href="{{ url_for('public.store_products') }}">Products</a>
-
-        <a href="{{ url_for('public.view_cart') }}">Cart</a>
-        <a href="{{ url_for('public.login') }}">Login</a>
-        <a href="{{ url_for('public.register') }}">Register</a>
+        {% if not current_user.is_authenticated: %}
+          <a href="{{ url_for('public.login') }}">Login</a>
+          <a href="{{ url_for('public.register') }}">Register</a>
+        {% else: %}
+          <a href="{{ url_for('public.view_cart') }}">Cart</a>
+          <a href="{{ url_for('public.logout') }}">Logout</a>
+        {% endif %}
       </nav>
     </div>
   </header>
