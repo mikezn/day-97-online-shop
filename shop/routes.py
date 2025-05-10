@@ -1,13 +1,30 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import current_user
 from .models import Product, User, Role, Order
 from .forms import CreateProductForm, CreateUserForm
 from . import db
+from functools import wraps
 
 shop_bp = Blueprint("shop", __name__, template_folder="templates")
 
+
+# used as a decorator to only return the route function if it's an admin user
+def admin_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # If id is not 1 then return abort with 403 error
+        if current_user.role.role != 'admin':
+            print("NOT ADMIN")
+            return abort(403)
+        # Otherwise continue with the route function
+        print("ADMIN ACCESS")
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @shop_bp.route("/product", methods=["GET", "POST"])
 @shop_bp.route("/product/<int:product_id>", methods=["GET", "POST"])
+@admin_only
 def manage_product(product_id=None):
     if product_id:
         product = Product.query.get_or_404(product_id)
@@ -36,12 +53,14 @@ def manage_product(product_id=None):
     return render_template("product_form.html", form=form, product=product)
 
 @shop_bp.route("/products", methods=["GET"])
+@admin_only
 def view_products():
     products = Product.query.all()
     return render_template("product_list.html", products=products)
 
 
 @shop_bp.route("/customers", methods=["GET"])
+@admin_only
 def view_customers():
     customers = db.session.query(User).join(Role).filter(Role.is_admin == False).all()
     return render_template("customer_list.html", customers=customers)
@@ -49,6 +68,7 @@ def view_customers():
 
 @shop_bp.route("/customer", methods=["GET", "POST"])
 @shop_bp.route("/customer/<int:user_id>", methods=["GET", "POST"])
+@admin_only
 def manage_customer(user_id=None):
     user = User.query.get(user_id) if user_id else None
     form = CreateUserForm(obj=user)
@@ -82,6 +102,7 @@ def manage_customer(user_id=None):
 
 
 @shop_bp.route("/orders")
+@admin_only
 def view_orders():
     # Ensure only admins can access
     if not current_user.role.is_admin:
@@ -105,6 +126,7 @@ def view_orders():
 
 
 @shop_bp.route("/admin/orders/<int:order_id>")
+@admin_only
 def view_order_detail(order_id):
     # Ensure only admins can access
     if not current_user.role.is_admin:

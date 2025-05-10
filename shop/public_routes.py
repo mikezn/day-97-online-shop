@@ -110,7 +110,7 @@ def login():
 @public_bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('store_products'))
+    return redirect(url_for('public.store_products'))
 
 
 @public_bp.route("/cart")
