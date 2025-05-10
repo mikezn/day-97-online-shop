@@ -298,28 +298,14 @@ def get_csrf_token():
 @login_required
 def order_confirmation():
     order_id = session.get("completed_order_id")
-    print(order_id)
-
     if not order_id:
-        flash("No recent order found.")
+        flash("No completed order found.")
         return redirect(url_for("public.store_home"))
 
-    # Fetch the specific completed order
-    completed_order = Order.query.filter_by(order_id=order_id, user_id=current_user.user_id, is_cart=False).first()
-
-    if not completed_order:
+    order = Order.query.get(order_id)
+    if not order or order.user_id != current_user.user_id:
         flash("Order not found.")
         return redirect(url_for("public.store_home"))
 
-    items = completed_order.order_products
-    total = sum(item.quantity * item.product.price for item in items)
-
-    # Clear the session to prevent reusing it
-    session.pop("completed_order_id", None)
-    session.pop("paypal_transaction_id", None)  # Clear PayPal Transaction ID too
-
-    return render_template("store_order_confirmation.html",
-                           order=completed_order,
-                           items=items,
-                           total=total,
-                           paypal_transaction_id=session.get("paypal_transaction_id"))
+    total = sum(item.quantity * item.product.price for item in order.order_products)
+    return render_template("store_order_confirmation.html", order=order, total=total)
