@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Order Management{% endblock %}
+
+{% block content %}
+<h2 class="form-heading">Order Management</h2>
+
+<table class="order-list">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Customer</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for summary in order_summaries %}
+    <tr>
+      <td>{{ summary.order.order_id }}</td>
+      <td>{{ summary.customer }}</td>
+      <td>${{ '%.2f' % summary.total }}</td>
+      <td>{{ "Completed" if not summary.order.is_cart else "In Cart" }}</td>
+      <td>
+        <a href="{{ url_for('shop.view_order_detail', order_id=summary.order.order_id) }}" class="btn-primary">View</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

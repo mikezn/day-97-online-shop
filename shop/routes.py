@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
-from .models import Product, User, Role
+from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import current_user
+from .models import Product, User, Role, Order
 from .forms import CreateProductForm, CreateUserForm
 from . import db
 
@@ -78,3 +79,39 @@ def manage_customer(user_id=None):
         return redirect(url_for("shop.customers_list"))
 
     return render_template("manage_customer.html", form=form, user=user)
+
+
+@shop_bp.route("/orders")
+def view_orders():
+    # Ensure only admins can access
+    if not current_user.role.is_admin:
+        flash("Access restricted to admins only.")
+        return redirect(url_for("public.store_home"))
+
+    # Fetch all orders with user and product information
+    orders = db.session.query(Order).join(User).order_by(Order.order_id.desc()).all()
+
+    # Calculate total for each order
+    order_summaries = []
+    for order in orders:
+        total = sum(item.quantity * item.product.price for item in order.order_products)
+        order_summaries.append({
+            "order": order,
+            "customer": order.user.name,
+            "total": total
+        })
+
+    return render_template("order_list.html", order_summaries=order_summaries)
+
+
+@shop_bp.route("/admin/orders/<int:order_id>")
+def view_order_detail(order_id):
+    # Ensure only admins can access
+    if not current_user.role.is_admin:
+        flash("Access restricted to admins only.")
+        return redirect(url_for("public.store_home"))
+
+    order = Order.query.get_or_404(order_id)
+    total = sum(item.quantity * item.product.price for item in order.order_products)
+
+    return render_template("order_detail.html", order=order, total=total)

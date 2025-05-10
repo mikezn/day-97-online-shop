@@ -588,3 +588,37 @@ body {
 .order-actions .btn-primary:hover {
   background-color: #0056b3;
 }
+
+
+.order-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.order-list th,
+.order-list td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.order-list th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+}
+
+.order-list tr:hover {
+  background-color: #f9f9f9;
+}
+
+.order-list td a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.order-list td a:hover {
+  text-decoration: underline;
+}
